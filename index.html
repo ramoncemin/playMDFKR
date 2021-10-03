@@ -17,7 +17,7 @@
 
     <script>
         let player;
-        var seekSteps = 10, seekToSecs = 0;
+        var seekSteps = 60, seekToSecs = 0;
         var bPlayBackWithCC = true;
         var language = document.getElementById('language');
         var btnNext = document.getElementById('btnNext');
@@ -92,8 +92,8 @@
             //player.loadModule("captions");  //Works for html5 ignored by AS3
             //player.loadModule("cc");  //Works for AS3 ignored by html5     
             player.loadVideoById({'videoId': videoHandler.value,
-                    'startSeconds': seekToSecs - 0.5,
-                    'endSeconds': seekToSecs + seekSteps});
+                    'startSeconds': seekToSecs - 1,
+                    'endSeconds': seekToSecs + seekSteps + 1});
             bPlayBackWithCC = false;
             //player.setOption('captions', 'track', {languageCode: 'fr'})               
             //player.seekTo(seekToSecs);    
@@ -111,8 +111,8 @@
 
             //player.setPlaybackRate(0.75);
             player.loadVideoById({'videoId': videoHandler.value,
-                    'startSeconds': seekToSecs - 0.5,
-                    'endSeconds': seekToSecs + seekSteps});
+                    'startSeconds': seekToSecs - 1,
+                    'endSeconds': seekToSecs + seekSteps + 1});
             bPlayBackWithCC = true;
             //player.seekTo(seekToSecs);
             //player.playVideo();
