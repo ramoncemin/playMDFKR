@@ -7,26 +7,39 @@
     <title>Document</title>
   </head>
   <body>
-    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    
     <label for="videoHandler">Handler</label>
-    <input type="text" id="videoHandler" required minlength="11" maxlength="11" size="11"><br> <br> 
+    <input type="text" id="videoHandler" required minlength="11" maxlength="11" size="11" value="qAPp_MMP3pI"><br> <br> 
     <label for="language">Language</label>
-    <input type="text" id="language" required minlength="2" maxlength="2" size="2" value="fr"><br> <br>     
+    <input type="text" id="language" required minlength="2" maxlength="2" size="2" value="fr"><br> <br>
+
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div><br> <br> 
+
     <button id='btnNext'>Next</button>
 
-    <script>
+    <script>                    
+        //1. todo fim de video zera variáveis do play
+        //2. todo fazer um dicionario com o par velocidade e tipo de playback(com ou sem legenda)
+        //tipo playBackRates = 0.75/Sub, 1/Sub e 1/Without Sub
+
         let player;
+
+        const tag = document.createElement('script');
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        
+        tag.src = 'https://www.youtube.com/iframe_api';
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
         var seekSteps = 60, seekToSecs = 0;
-        var bPlayBackWithCC = true;
         var language = document.getElementById('language');
         var btnNext = document.getElementById('btnNext');
         var videoHandler = document.getElementById('videoHandler');
-        var playBackRates = [/*0.25, 0.5, */0.75, 1, /*1.25, 1.5, 1.75, 2*/];
+        var playBackRates = [{speed:0.75, captions:true},{speed:1, captions:true},{speed:1, captions:false}];
         var indexPlayBackRates = 0;
 
         document.onkeyup = function(e) {
-            if (e.which == 78) {
+            if (e.which == 78) {//'N'
                 playMDFKR();
             } 
         };        
@@ -36,138 +49,83 @@
         }, false);
 
         function playMDFKR(){
-            player.setPlaybackRate(playBackRates[indexPlayBackRates]);
-            //console.log('indexPlayBackRates=' + indexPlayBackRates);
+            console.log('playBackRates[' + indexPlayBackRates + '].captions=' + playBackRates[indexPlayBackRates].captions + ' seekToSecs=' + seekToSecs);
+            player.setPlaybackRate(playBackRates[indexPlayBackRates].speed);
 
-            if(bPlayBackWithCC){
-                playBackWithCC();
-            }else{
-                playBackWithoutCC();
-            }
+            //if(playBackRates[indexPlayBackRates].captions){
+            //    player.unloadModule("captions");  //Works for html5 ignored by AS3
+            //    player.unloadModule("cc");  //Works for AS3 ignored by html5     
+            //}            
+
+            player.loadVideoById({'videoId': videoHandler.value,
+                                  'startSeconds': seekToSecs - 1,
+                                  'endSeconds': seekToSecs + seekSteps + 1});   
+
         }
-            
-//todo fim de video zera variáveis do play
-//todo fazer um dicionario com o par velocidade e tipo de playback(com ou sem legenda)
-//tipo playBackRates = 0.75/Sub, 1/Sub e 1/Without Sub
-
-        const tag = document.createElement('script')
-        tag.src = 'https://www.youtube.com/iframe_api'
-        const firstScriptTag = document.getElementsByTagName('script')[0]
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
 
         const onApiChange = _ => {   
-        if (typeof player.setOption === 'function' && !bPlayBackWithCC) {
-            player.setOption('captions', 'track', {languageCode: language.value});
-            //alert(0);
-        }  
-        
-        }
-        //https://youtube.com/get_video_info?video_id=abcfQpQSU7s
-        //https://video.google.com/timedtext?lang=pt&v=abcfQpQSU7s
-        const onReady = _ => {       
-            //alert(0);
-        //playBackWithCC();  
-        //player.setOption('captions', 'track', {languageCode: 'fr'});
-
-        }
-
-        function onYouTubePlayerAPIReady() {
-        player = new YT.Player('player', {
-                                height: '360',
-                                width: '640',
-                                videoId: '',
-                                playerVars: {
-                                cc_load_policy: 1,
-                                //controls: 0
-                                },
-                                events: {onReady,
-                                     onApiChange
-                                }
-                    })
-        }
-
-        function playBackWithCC(){
-            console.log('playBackWithCC=' + seekToSecs);    
-            //player.setPlaybackRate(0.75);
-            //player.loadModule("captions");  //Works for html5 ignored by AS3
-            //player.loadModule("cc");  //Works for AS3 ignored by html5     
-            player.loadVideoById({'videoId': videoHandler.value,
-                    'startSeconds': seekToSecs - 1,
-                    'endSeconds': seekToSecs + seekSteps + 1});
-            bPlayBackWithCC = false;
-            //player.setOption('captions', 'track', {languageCode: 'fr'})               
-            //player.seekTo(seekToSecs);    
-            //player.playVideo();
-            //setTimeout(playBackWithoutCC, seekSteps*1000);
-            //player.pauseVideo();    
-        }
-
-        function playBackWithoutCC(){                
-            console.log('playBackWithoutCC=' + seekToSecs);
-            player.unloadModule("captions");  //Works for html5 ignored by AS3
-            player.unloadModule("cc");  //Works for AS3 ignored by html5     
+            //console.log('playBackRates[' + indexPlayBackRates + '].captions=' + playBackRates[indexPlayBackRates].captions);
             
-            //waitSeconds(3000);
-
-            //player.setPlaybackRate(0.75);
-            player.loadVideoById({'videoId': videoHandler.value,
-                    'startSeconds': seekToSecs - 1,
-                    'endSeconds': seekToSecs + seekSteps + 1});
-            bPlayBackWithCC = true;
-            //player.seekTo(seekToSecs);
-            //player.playVideo();
-            //setTimeout(playBackWithCC, seekSteps*1000);
-            //player.pauseVideo();    
-            if(indexPlayBackRates >= playBackRates.length - 1){
-                seekToSecs += seekSteps;
-                indexPlayBackRates = 0;
-                //console.log('indexPlayBackRates = 0');
-            }else{
-                indexPlayBackRates++;         
-            }
-            
-            //console.log('indexPlayBackRates=' + indexPlayBackRates);
+            if (typeof player.setOption === 'function' && playBackRates[indexPlayBackRates].captions) {
+                //alert(0);
+                //player.setOption('captions', 'track', {languageCode: language.value});
+            }          
         }
 
-        /*function waitSeconds(iMilliSeconds) {
-            var counter= 0
-                , start = new Date().getTime()
-                , end = 0;
-            while (counter < iMilliSeconds) {
-                end = new Date().getTime();
-                counter = end - start;
+
+        const onStateChange = _ => {
+            if(player.getPlayerState() === 1){
+                if (typeof player.setOption === 'function' && !playBackRates[indexPlayBackRates].captions) {
+                    player.unloadModule("captions");  //Works for html5 ignored by AS3
+                    player.unloadModule("cc");  //Works for AS3 ignored by html5  
+                }  
+
+                if(indexPlayBackRates >= playBackRates.length - 1){
+                    seekToSecs += seekSteps;
+                    indexPlayBackRates = 0;
+                }else{      
+                    indexPlayBackRates++;         
+                } 
+
             }
+
+            //alert(player.getPlayerState());
+            /*
+            if(player.getPlayerState() == 0){
+                if(indexPlayBackRates >= playBackRates.length - 1){
+                    seekToSecs += seekSteps;
+                    indexPlayBackRates = 0;
+                }else{      
+                    indexPlayBackRates++;         
+                }  
+            }
+            */
+            //player.setOption('captions', 'track', {languageCode: language.value});
         }
-
-        function playMDFKR(){
-            //while(player.getPlayerState() != 0){
-                playBackWithCC();
-
-                //playBackWithoutCC();
-            //}
-        }*/
-
-
 
         /*
-        --with captions
-        player.loadModule("captions");  //Works for html5 ignored by AS3
-        player.loadModule("cc");  //Works for AS3 ignored by html5    
-        player.setOption('captions', 'track', {languageCode: 'fr'})
-        player.setPlaybackRate(0.75);
-        player.loadVideoById({'videoId': 'bRLWRS5I0To',
-                    'startSeconds': 5,
-                    'endSeconds': 100});
-                
+        const onReady = _ => {       
 
-        --without captions
-        
-        player.setOption('');
-        player.setPlaybackRate(0.75);
-        player.seekTo(5);
-        player.unloadModule("captions");  //Works for html5 ignored by AS3
-        player.unloadModule("cc");  //Works for AS3 ignored by html5 
+        }
         */
+
+        function onYouTubePlayerAPIReady() {
+            player = new YT.Player('player', {height: '360',
+                                              width: '640',
+                                              videoId: '',
+                                              //fs: 0,
+                                              //controls: 0,
+                                              //iv_load_policy: 3,
+                                              //modestbranding: 1,
+                                              playerVars: {
+                                                //cc_load_policy: 1,
+                                              },
+                                              events: {//onReady,
+                                                  onApiChange,
+                                                  onStateChange
+                                              }
+                    })
+        }
 
     </script>
   </body>
