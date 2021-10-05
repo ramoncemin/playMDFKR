@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PlayMDFKR 1.8</title>
+    <title>PlayMDFKR 1.9</title>
   </head>
   <body>
     
     <label for="videoHandler">Handler</label>
-    <input type="text" id="videoHandler" required minlength="11" maxlength="11" size="11" value="qAPp_MMP3pI"><br> <br> 
+    <input type="text" id="videoHandler" required minlength="11" maxlength="11" size="11" value="cRIRim8s4uM"><br> <br> 
     <label for="language">Language</label>
     <input type="text" id="language" required minlength="2" maxlength="2" size="2" value="fr"><br> <br>
 
@@ -61,16 +61,6 @@
 
         }
 
-        const onApiChange = _ => {   
-            console.log('playBackRates[' + indexPlayBackRates + '].captions=' + playBackRates[indexPlayBackRates].captions);
-            
-            if (typeof player.setOption === 'function' && playBackRates[indexPlayBackRates].captions) {
-                //alert(0);
-                //player.setOption('captions', 'track', {languageCode: language.value});
-            }          
-        }
-
-
         const onStateChange = _ => {
             if(player.getPlayerState() === 1 && bPlayIniatedByScript){
                 bPlayIniatedByScript = false;
@@ -78,8 +68,10 @@
                     player.unloadModule("captions");  //Works for html5 ignored by AS3
                     player.unloadModule("cc");  //Works for AS3 ignored by html5  
                 }else{
+                    player.setOption('captions', 'track', {languageCode: language.value});
                     player.loadModule("captions");  //Works for html5 ignored by AS3
-                    player.loadModule("cc");  //Works for AS3 ignored by html5  
+                    player.loadModule("cc");  //Works for AS3 ignored by html5      
+
                 } 
 
                 if(indexPlayBackRates >= playBackRates.length - 1){
@@ -92,28 +84,20 @@
 
         }
 
-        /*
-        const onReady = _ => {       
-
-        }
-        */
-
         function onYouTubePlayerAPIReady() {
             player = new YT.Player('player', {height: '360',
                                               width: '640',
                                               videoId: '',
- 
                                               playerVars: {
                                                 cc_load_policy: 1,
                                                 fs: 0,
-                                                //controls: 0,
-                                                //iv_load_policy: 3,
-                                                //modestbranding: 1,
+                                                controls: 0,
+                                                iv_load_policy: 3,
+                                                modestbranding: 1,
                                               },
-                                              events: {//onReady,
-                                                  onApiChange,
-                                                  onStateChange
-                                              }
+                                              events: {
+                                                        onStateChange
+                                                      }
                     })
         }
 
